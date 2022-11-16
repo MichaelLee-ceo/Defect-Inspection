@@ -1,0 +1,4 @@
+# ingore point cloud file and figure file
+*.ply
+*.png
+*.jpg
