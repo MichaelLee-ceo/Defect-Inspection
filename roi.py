@@ -9,63 +9,42 @@ from sklearn.cluster import KMeans
 Color_Lower = (65, 65, 65)
 Color_Upper = (200, 200, 200)
 
-def findContour(img_path):
+def findContour(img_path, result_path):
     img = cv2.imread(img_path)
     invert = cv2.bitwise_not(img)
     gray = cv2.cvtColor(invert, cv2.COLOR_BGR2GRAY)
     frame = cv2.GaussianBlur(gray, (11, 11), 0)
-    ret, threshed_img = cv2.threshold(gray, 200, 65, cv2.THRESH_BINARY)
     # dilate = cv2.dilate(frame, None, iterations=2)
     # erode = cv2.erode(dilate, None, iterations=2)
-
-    # mask = cv2.inRange(frame, Color_Lower, Color_Upper)
+    ret, threshed_img = cv2.threshold(frame, 200, 65, cv2.THRESH_BINARY)
 
     # cv2.imshow('Image', threshed_img)
     # cv2.waitKey(0)
 
     (contours, _) = cv2.findContours(threshed_img, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-    print(len(contours))
-
     cv2.drawContours(img, contours, -1, (0, 255, 0), 2)
-
     # for c in contours:
-    #     # get the bounding rect
     #     x, y, w, h = cv2.boundingRect(c)
-    #     cv2.rectangle(img, (x, y), (x + w, y + h), (0, 255, 0), thickness=1, lineType=8, shift=0)
-    cv2.imshow("Frame", img)
-    cv2.waitKey(0)
+    #     cv2.rectangle(img, (x, y), (x + w, y + h), (0, 255, 0), thickness=2, lineType=8, shift=0)
+
+    cv2.imwrite(result_path + img_path.split('/')[-1] , img)
+    print("[INFO] save result to:", result_path + img_path.split('/')[-1])
+    # cv2.imshow("Frame", img)
+    # cv2.waitKey(0)
 
 
-findContour('./result.png')
+
+filtered_path = "./20221024/component_extraction/"
+if not os.path.exists(filtered_path):
+    os.makedirs(filtered_path)
+    print("[+] Creating component dir", filtered_path)
+
+detection_path = "./20221024/defect_detection/"
+if not os.path.exists(detection_path):
+    os.makedirs(detection_path)
+    print("[+] Creating defection dir", detection_path)
 
 
-# img_path = './20221020/color/'
-# img_path = os.path.join(os.getcwd(), img_path)
-# #
-# img_files = [os.path.join(img_path,f) for f in os.listdir(img_path) if os.path.isfile(os.path.join(img_path, f))]
-# print('Find', len(img_files), 'files')
-#
-# images = []
-# for file in img_files:
-#     img = cv2.imread(file)
-#     images.append(img)
-
-# gray = cv2.cvtColor(images[0], cv2.COLOR_BGR2GRAY) #convert roi into gray
-# ret, threshed_img = cv2.threshold(gray, 50, 150, cv2.THRESH_BINARY)
-
-# threshed_img = cv2.dilate(threshed_img, None, iterations = 5)
-# thresh = cv2.erode(threshed_img, None, iterations = 5)
-# cv2.imshow('Image', threshed_img)
-# cv2.waitKey(0)
-# Canny=cv2.Canny(thresh,50,50) #apply canny to roi
-# contours =cv2.findContours(Canny,cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_NONE)[0]
-# for c in contours:
-    # get the bounding rect
-    # x, y, w, h = cv2.boundingRect(c)
-    # cv2.rectangle(images[0], (x, y), (x + w, y + h), (0, 255, 0), thickness=1, lineType=8, shift=0)
-# cv2.imwrite('temp.png', threshed_img)
-
-# ply_path = './20221020/RGBcloud/'
 # ply_path = './20221024/20221024RGB/'
 # ply_path = os.path.join(os.getcwd(), ply_path)
 #
@@ -117,14 +96,14 @@ findContour('./result.png')
 #     points = o3d.geometry.PointCloud()
 #     points.points = o3d.utility.Vector3dVector(filtered_component)
 #     points.colors = o3d.utility.Vector3dVector(filtered_color)
-#     o3d.visualization.draw_geometries([points])
+#     # o3d.visualization.draw_geometries([points])
 #
 #     vis = o3d.visualization.Visualizer()
 #     vis.create_window()
 #     vis.add_geometry(points)
 #     vis.poll_events()
 #     vis.update_renderer()
-#     vis.capture_screen_image('result.png')
+#     vis.capture_screen_image(filtered_path + ply_files[i].split('/')[-1].replace('ply', 'png'))
 #     vis.destroy_window()
 
 
@@ -134,3 +113,10 @@ findContour('./result.png')
     # cv2.imwrite('./20221020/result/' + 'result_' + str(i) + '.png', images[i])
     # plt.close()
     # print('Write ' + str(i) + ' file')
+
+img_path = os.path.join(os.getcwd(), filtered_path)
+img_files = [os.path.join(img_path, f) for f in os.listdir(img_path) if os.path.isfile(os.path.join(img_path, f))]
+print('Find', len(img_files), 'files')
+
+for file in img_files:
+    findContour(file, detection_path)
