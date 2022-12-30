@@ -6,49 +6,90 @@ import open3d as o3d
 import numpy as np
 from sklearn.cluster import KMeans
 
-kmeans = KMeans(n_clusters=3)
 
-def mkdir(path):
-    if not os.path.exists(path):
-        os.makedirs(path)
-        print("[+] Creating dir", path)
+def mkdir(dirpath):
+    if not os.path.exists(dirpath):
+        os.makedirs(dirpath)
+        print("[+] Creating dir", dirpath)
 
 
-def findContour(img_path, result_path):
-    img = cv2.imread(img_path)
-    height, width, channel = img.shape
+def getFiles(filepath):
+    file_path = os.path.join(os.getcwd(), filepath)
+    files = [os.path.join(file_path, f) for f in os.listdir(file_path) if os.path.isfile(os.path.join(file_path, f))]
+    print('Find', len(files), 'files in', filepath)
 
-    invert = cv2.bitwise_not(img)
-    gray = cv2.cvtColor(invert, cv2.COLOR_BGR2GRAY)
-    frame = cv2.GaussianBlur(gray, (11, 11), 0)
-    # dilate = cv2.dilate(frame, None, iterations=2)
-    # erode = cv2.erode(dilate, None, iterations=2)
-    ret, threshed_img = cv2.threshold(frame, 155, 65, cv2.THRESH_BINARY)
-    # cv2.imshow("Frame", threshed_img)
-    # cv2.waitKey(0)
+    return files
 
-    (contours, _) = cv2.findContours(threshed_img, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-    # cv2.drawContours(img, contours, -1, (0, 255, 0), 2)
-    for c in contours:
-        x, y, w, h = cv2.boundingRect(c)
-        cv2.rectangle(img, (x, y), (x + w, y + h), (0, 255, 0), thickness=2, lineType=8, shift=0)
 
-    y = int(height / 6)
-    x = int(width / 4)
-    crop_img = img[y:y*5, x:x*3]
-    crop_img = cv2.resize(crop_img, (224, 224))
+def saveImage_txt(image, image_path, content, content_path):
+    cv2.imwrite(image_path, image)
+    with open(content_path, "w") as label_file:
+        label_file.write(content)
 
-    cv2.imwrite(result_path + img_path.split('/')[-1] , crop_img)
-    print("[INFO] save result to:", result_path + img_path.split('/')[-1])
-    # cv2.imshow("Frame", crop_img)
-    # cv2.waitKey(0)
+    print("[INFO] save result to:", image_path, content_path)
+
+
+def findContour(image_path, data_path, label_path):
+    img_files = getFiles(image_path)
+    count = 0
+    for idx, img_path in enumerate(img_files):
+        img = cv2.imread(img_path)
+        height, width, channel = img.shape
+
+        y = int(height / 6)
+        x = int(width / 4)
+        crop_img = img[y:y * 5, x:x * 3]
+        crop_img = cv2.resize(crop_img, (512, 512))
+
+        invert = cv2.bitwise_not(crop_img)
+        gray = cv2.cvtColor(invert, cv2.COLOR_BGR2GRAY)
+        frame = cv2.GaussianBlur(gray, (9, 9), 0)
+        # dilate = cv2.dilate(frame, None, iterations=2)
+        # erode = cv2.erode(dilate, None, iterations=2)
+        ret, threshed_img = cv2.threshold(frame, 170, 70, cv2.THRESH_BINARY)
+        # cv2.imshow("Frame", threshed_img)
+        # cv2.waitKey(0)
+
+        (contours, _) = cv2.findContours(threshed_img, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+        # cv2.drawContours(crop_img, contours, -1, (0, 255, 0), 2)
+        # cv2.imshow("Frame", crop_img)
+        # cv2.waitKey(0)
+
+        ''' YOLO format: <object-class> <x_center> <y_center> <width> <height> '''
+        content = ""
+        for c in contours:
+            x, y, w, h = cv2.boundingRect(c)
+            # cv2.rectangle(crop_img, (x, y), (x + w, y + h), (0, 255, 0), thickness=2, lineType=8, shift=0)
+
+            x_center, y_center = x + w/2, y + h/2
+            content += ("0" + " " + str(x_center/512) + " " + str(y_center/512) + " " + str(w/512) + " " + str(h/512) + "\n")
+
+        save_path_img = data_path + str(count) + ".png"
+        save_path_txt = label_path + str(count) + ".txt"
+        saveImage_txt(crop_img, save_path_img, content, save_path_txt)
+
+        # gammas = [0.3, 0.5, 0.7]
+        gammas = []
+        for gamma in gammas:
+            count += 1
+            save_path_img = data_path + str(count) + ".png"
+            save_path_txt = label_path + str(count) + ".txt"
+            aug_img = add_light(crop_img, gamma)
+            saveImage_txt(aug_img, save_path_img, content, save_path_txt)
+
+        count += 1
+
+
+def add_light(image, gamma=1.0):
+    invGamma = 1.0 / gamma
+    table = np.array([((i / 255.0) ** invGamma) * 255 for i in np.arange(0, 256)]).astype("uint8")
+    new_image = cv2.LUT(image, table)
+    return new_image
 
 
 def getComponent(ply_path, component_path):
-    ply_path = os.path.join(os.getcwd(), ply_path)
-    ply_files = [os.path.join(ply_path, f) for f in os.listdir(ply_path) if os.path.isfile(os.path.join(ply_path, f))]
-    print('Find', len(ply_files), 'ply files')
-
+    ply_files = getFiles(ply_path)
+    kmeans = KMeans(n_clusters=3)
     for i in range(0, len(ply_files)):
         simple_pcd = o3d.io.read_point_cloud(ply_files[i])                      # 讀點雲 .ply 檔案
         simple_pcd = simple_pcd.voxel_down_sample(voxel_size=0.002)
@@ -82,11 +123,6 @@ def getComponent(ply_path, component_path):
         # filtered_color *= 255
         print('Filter Color: ', filtered_color.shape)
 
-
-        # img = o3d.geometry.Image((z).astype(np.uint8))
-        # o3d.io.write_image("./sync.png", img)
-        # o3d.visualization.draw_geometries([img])
-
         ''' 用取出來的加工物件跟對應的顏色，建立新的 3D Point Cloud '''
         points = o3d.geometry.PointCloud()
         points.points = o3d.utility.Vector3dVector(filtered_component)
@@ -100,26 +136,3 @@ def getComponent(ply_path, component_path):
         vis.update_renderer()
         vis.capture_screen_image(component_path + ply_files[i].split('/')[-1].replace('ply', 'png'))
         vis.destroy_window()
-
-
-        # gray = cv2.cvtColor(color_load, cv2.COLOR_BGR2GRAY)  # convert roi into gray
-        # print(gray.shape, color_load.shape)
-        # ret, threshed_img = cv2.threshold(gray, 50, 150, cv2.THRESH_BINARY)
-        # cv2.imwrite('./20221020/result/' + 'result_' + str(i) + '.png', images[i])
-        # plt.close()
-        # print('Write ' + str(i) + ' file')
-
-component_path = "./yolo/component_extraction/"
-detection_path = "./yolo/defect_detection/"
-mkdir(component_path)
-mkdir(detection_path)
-
-ply_path = './yolo/RGBCLOUD/20221207/'
-# getComponent(ply_path, component_path, detection_path)
-
-img_path = os.path.join(os.getcwd(), component_path)
-img_files = [os.path.join(img_path, f) for f in os.listdir(img_path) if os.path.isfile(os.path.join(img_path, f))]
-print('Find', len(img_files), 'files')
-
-for file in img_files:
-    findContour(file, detection_path)
