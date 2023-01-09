@@ -1,11 +1,24 @@
 import os
 import cv2
-from PIL import Image
+import copy
 import matplotlib.pyplot as plt
 import open3d as o3d
 import numpy as np
 from sklearn.cluster import KMeans
 
+def display_inlier_outlier(cloud, ind):
+    inlier_cloud = cloud.select_by_index(ind)
+    outlier_cloud = cloud.select_by_index(ind, invert=True)
+
+    print("Showing outliers (red) and inliers (gray): ")
+    outlier_cloud.paint_uniform_color([1, 0, 0])
+    inlier_cloud.paint_uniform_color([0.8, 0.8, 0.8])
+    o3d.visualization.draw_geometries([inlier_cloud, outlier_cloud],
+                                      zoom=0.7,
+                                      front=[0, 0, 1],
+                                      lookat=[0.037595129930056065, -0.017835838099320725, 0.89047966202100115],
+                                      up=[0, 1, 0]
+                                      )
 
 def mkdir(dirpath):
     if not os.path.exists(dirpath):
@@ -90,9 +103,11 @@ def add_light(image, gamma=1.0):
 def getComponent(ply_path, component_path):
     ply_files = getFiles(ply_path)
     kmeans = KMeans(n_clusters=3)
+    content = ""
     for i in range(0, len(ply_files)):
         simple_pcd = o3d.io.read_point_cloud(ply_files[i])                      # 讀點雲 .ply 檔案
         simple_pcd = simple_pcd.voxel_down_sample(voxel_size=0.002)
+        # simple_pcd = simple_pcd.uniform_down_sample(every_k_points=10)
         # aabb = simple_pcd.get_axis_aligned_bounding_box()
         # aabb.color = (1, 0, 0)
 
@@ -129,10 +144,51 @@ def getComponent(ply_path, component_path):
         points.colors = o3d.utility.Vector3dVector(filtered_color)
         # o3d.visualization.draw_geometries([points])
 
+        # cl, ind = points.remove_statistical_outlier(nb_neighbors=20, std_ratio=0.01)
+        # inlier_cloud = cl.select_by_index(ind)
+        # display_inlier_outlier(points, ind)
+
         vis = o3d.visualization.Visualizer()
-        vis.create_window()
+        vis.create_window(visible=False)
         vis.add_geometry(points)
+
+        ctr = vis.get_view_control()
+        ctr.set_lookat([0.037595129930056065, -0.017835838099320725, 0.89047966202100115])
+        ctr.set_front([0, 0, 1])
+        ctr.set_up([0, 1, 0])
+
+        # content += str(ctr.convert_to_pinhole_camera_parameters().extrinsic) + "\n\n"
+        # content += str(ctr.convert_to_pinhole_camera_parameters().intrinsic.intrinsic_matrix) + "\n\n"
+
         vis.poll_events()
         vis.update_renderer()
         vis.capture_screen_image(component_path + ply_files[i].split('/')[-1].replace('ply', 'png'))
         vis.destroy_window()
+
+        del ctr
+        del vis
+
+        # intrinsic_matrix = ctr.convert_to_pinhole_camera_parameters().intrinsic.intrinsic_matrix
+        # extrinsic_matrix = ctr.convert_to_pinhole_camera_parameters().extrinsic
+        # print("Intrinsic Matrix:", intrinsic_matrix.shape)
+        # print("Extrinsic Matrix:", extrinsic_matrix.shape)
+
+        # transformed = copy.deepcopy(points).transform(extrinsic_matrix)
+        # tmp = np.transpose(np.asarray(transformed.points))
+        #
+        # trans_xyz = np.transpose(np.dot(intrinsic_matrix, tmp))
+        # print(trans_xyz.shape)
+
+        # xyz = np.asarray(points.points)
+        # x1, y1, z1 = xyz[:, 0], xyz[:, 1], xyz[:, 2]
+        # x2, y2, z2 = trans_xyz[:, 0], trans_xyz[:, 1], trans_xyz[:, 2]
+
+        # fig = plt.figure()
+        # ax = fig.gca(projection='3d')
+        # ax.scatter(x1, y1, z1, c='deepskyblue', label='Original 3D')
+        # ax.scatter(x2, y2, z2, c='orange', label='Transformed')
+        # ax.legend()
+        # plt.show()
+
+    # with open('extrinsic.txt', "w") as label_file:
+    #     label_file.write(content)
