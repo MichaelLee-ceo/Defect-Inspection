@@ -1,8 +1,8 @@
 from roi import *
 
 component_path = "./yolo/component_extraction/"
-data_path = "./yolo/dataset/data/"
-label_path = "./yolo/dataset/label/"
+data_path = "./yolo/visualize/dataset/data/"
+label_path = "./yolo/visualize/dataset/label/"
 
 mkdir(component_path)
 mkdir(data_path)
