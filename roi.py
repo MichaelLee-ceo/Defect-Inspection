@@ -54,13 +54,19 @@ def findContour(image_path, data_path, label_path):
         crop_img = img[y:y * 5, x:x * 3]
         crop_img = cv2.resize(crop_img, (512, 512))
 
-        invert = cv2.bitwise_not(crop_img)
-        gray = cv2.cvtColor(invert, cv2.COLOR_BGR2GRAY)
-        frame = cv2.GaussianBlur(gray, (9, 9), 0)
+        # contrast_img = crop_img * float(2.2)
+        # contrast_img[contrast_img > 255] = 255
+        # contrast_img = np.round(contrast_img)
+        # contrast_img = contrast_img.astype(np.uint8)
+
+        gray = cv2.cvtColor(crop_img, cv2.COLOR_BGR2GRAY)
+        invert = cv2.bitwise_not(gray)
+
+        # gray = cv2.GaussianBlur(gray, (5, 5), 0)
         # dilate = cv2.dilate(frame, None, iterations=2)
         # erode = cv2.erode(dilate, None, iterations=2)
-        ret, threshed_img = cv2.threshold(frame, 170, 70, cv2.THRESH_BINARY)
-        # cv2.imshow("Frame", threshed_img)
+        ret, threshed_img = cv2.threshold(invert, 155, 255, cv2.THRESH_BINARY)
+        # cv2.imshow("Frame", np.concatenate((gray, threshed_img), axis=1))
         # cv2.waitKey(0)
 
         (contours, _) = cv2.findContours(threshed_img, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
@@ -72,7 +78,7 @@ def findContour(image_path, data_path, label_path):
         content = ""
         for c in contours:
             x, y, w, h = cv2.boundingRect(c)
-            # cv2.rectangle(crop_img, (x, y), (x + w, y + h), (0, 255, 0), thickness=2, lineType=8, shift=0)
+            cv2.rectangle(crop_img, (x, y), (x + w, y + h), (0, 255, 0), thickness=2, lineType=8, shift=0)
 
             x_center, y_center = x + w/2, y + h/2
             content += ("0" + " " + str(x_center/512) + " " + str(y_center/512) + " " + str(w/512) + " " + str(h/512) + "\n")
@@ -154,8 +160,8 @@ def getComponent(ply_path, component_path):
 
         ctr = vis.get_view_control()
         ctr.set_lookat([0.037595129930056065, -0.017835838099320725, 0.89047966202100115])
-        ctr.set_front([0, 0, 1])
-        ctr.set_up([0, 1, 0])
+        ctr.set_front([0, 0, -1])
+        ctr.set_up([0, -1, 0])
 
         # content += str(ctr.convert_to_pinhole_camera_parameters().extrinsic) + "\n\n"
         # content += str(ctr.convert_to_pinhole_camera_parameters().intrinsic.intrinsic_matrix) + "\n\n"
@@ -185,6 +191,7 @@ def getComponent(ply_path, component_path):
 
         # fig = plt.figure()
         # ax = fig.gca(projection='3d')
+        # ax.view_init(azim=0, elev=90)
         # ax.scatter(x1, y1, z1, c='deepskyblue', label='Original 3D')
         # ax.scatter(x2, y2, z2, c='orange', label='Transformed')
         # ax.legend()
