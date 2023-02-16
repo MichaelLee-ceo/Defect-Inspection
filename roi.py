@@ -106,79 +106,51 @@ def add_light(image, gamma=1.0):
     return new_image
 
 
-def getComponent(ply_path, component_path, tmp_path):
-    ply_files = getFiles(ply_path)
-    before_files = getFiles(tmp_path)
-    kmeans = KMeans(n_clusters=3)
-    content = ""
-    for i in range(0, len(ply_files)):
-        print(ply_files[i])
-        simple_pcd = o3d.io.read_point_cloud(ply_files[i])                      # 讀點雲 .ply 檔案
-        simple_pcd = simple_pcd.voxel_down_sample(voxel_size=0.002)
+def getComponent(before_path, after_path):
+    before_plys = getFiles(before_path)
+    after_plys = getFiles(after_path)
 
-        before_pcd = o3d.io.read_point_cloud(before_files[i])  # 讀點雲 .ply 檔案
+    for i in range(0, len(before_plys)):
+        print("Reading:", before_plys[i])
+        before_pcd = o3d.io.read_point_cloud(before_plys[i])  # 讀點雲 .ply 檔案
         before_pcd = before_pcd.voxel_down_sample(voxel_size=0.002)
-        o3d.visualization.draw_geometries([simple_pcd, before_pcd])
-        # simple_pcd = simple_pcd.uniform_down_sample(every_k_points=10)
-        # aabb = simple_pcd.get_axis_aligned_bounding_box()
-        # aabb.color = (1, 0, 0)
 
-        xyz_load = np.asarray(simple_pcd.points)
-        color_load = np.asarray(simple_pcd.colors)
+        after_pcd = o3d.io.read_point_cloud(after_plys[i])  # 讀點雲 .ply 檔案
+        after_pcd = after_pcd.voxel_down_sample(voxel_size=0.002)
 
-        x, y, z = xyz_load[:, 0], xyz_load[:, 1], xyz_load[:, 2]
-        print('3D Point Cloud shape:', xyz_load.shape)
+        before_load, before_color = np.asarray(before_pcd.points), np.asarray(before_pcd.colors)
+        after_load, after_color = np.asarray(after_pcd.points), np.asarray(after_pcd.colors)
 
-        result = kmeans.fit(z.reshape(-1, 1))
-        center = result.cluster_centers_
-        predict_label = result.labels_
+        # x, y, z = before_load[:, 0], before_load[:, 1], before_load[:, 2]
+        # print('3D Point Cloud shape:', before_load.shape)
 
-        ''' 透過 cluster 的中心點，把加工物件與桌面分離 '''
-        center_min = np.argmin(center)
-        object = np.where(predict_label == center_min)
+        # assign color to point cloud
+        before_color = np.ones(before_load.shape) * 0.5
+        after_color = np.ones(after_load.shape) * 0.1
+        before_pcd.colors = o3d.utility.Vector3dVector(before_color)
+        after_pcd.colors = o3d.utility.Vector3dVector(after_color)
+        o3d.visualization.draw_geometries([before_pcd, after_pcd])
 
-        filtered_component = np.take(xyz_load, object, axis=0).squeeze(0)
-        print('Filtered Point Cloud: ', filtered_component.shape)
 
-        ''' color thresholding '''
-        # for i in range(color_load.shape[0]):
-        #     for j in range(3):
-        #         if color_load[i][j] > 0.2:
-        #             color_load[i][j] = 0.95
-
-        filtered_color = np.take(color_load, object, axis=0).squeeze(0)
-        # filtered_color *= 255
-        print('Filter Color: ', filtered_color.shape)
-
-        ''' 用取出來的加工物件跟對應的顏色，建立新的 3D Point Cloud '''
-        points = o3d.geometry.PointCloud()
-        points.points = o3d.utility.Vector3dVector(filtered_component)
-        points.colors = o3d.utility.Vector3dVector(filtered_color)
-        # o3d.visualization.draw_geometries([points])
-
-        # cl, ind = points.remove_statistical_outlier(nb_neighbors=20, std_ratio=0.01)
-        # inlier_cloud = cl.select_by_index(ind)
-        # display_inlier_outlier(points, ind)
-
-        vis = o3d.visualization.Visualizer()
-        vis.create_window(visible=False)
-        vis.add_geometry(points)
-
-        ctr = vis.get_view_control()
-        ctr.set_lookat([0.037595129930056065, -0.017835838099320725, 0.89047966202100115])
-        ctr.set_front([0, 0, -1])
-        ctr.set_up([0, -1, 0])
-
-        # content += str(ctr.convert_to_pinhole_camera_parameters().extrinsic) + "\n\n"
-        # content += str(ctr.convert_to_pinhole_camera_parameters().intrinsic.intrinsic_matrix) + "\n\n"
-
-        vis.poll_events()
-        vis.update_renderer()
-        vis.capture_screen_image(component_path + ply_files[i].split('/')[-1].replace('ply', 'png'))
-        vis.destroy_window()
-
-        del ctr
-        del vis
+        # vis = o3d.visualization.Visualizer()
+        # vis.create_window(visible=False)
+        # vis.add_geometry(points)
+        #
+        # ctr = vis.get_view_control()
+        # ctr.set_lookat([0.037595129930056065, -0.017835838099320725, 0.89047966202100115])
+        # ctr.set_front([0, 0, -1])
+        # ctr.set_up([0, -1, 0])
+        #
+        # # content += str(ctr.convert_to_pinhole_camera_parameters().extrinsic) + "\n\n"
+        # # content += str(ctr.convert_to_pinhole_camera_parameters().intrinsic.intrinsic_matrix) + "\n\n"
+        #
+        # vis.poll_events()
+        # vis.update_renderer()
+        # vis.capture_screen_image(component_path + ply_files[i].split('/')[-1].replace('ply', 'png'))
+        # vis.destroy_window()
+        #
+        # del ctr
+        # del vis
 
         # intrinsic_matrix = ctr.convert_to_pinhole_camera_parameters().intrinsic.intrinsic_matrix
         # extrinsic_matrix = ctr.convert_to_pinhole_camera_parameters().extrinsic
