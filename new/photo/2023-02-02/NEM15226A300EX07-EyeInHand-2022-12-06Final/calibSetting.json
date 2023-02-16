@@ -1,0 +1,346 @@
+{
+    "calib_board": {
+        "board_name": "BDB-6",
+        "circle_detect_param": {
+            "blobParams": {
+                "blobColor": 255,
+                "maxArea": 10000,
+                "maxThreshold": 80,
+                "minArea": 1000,
+                "minBlobDist": 50,
+                "minThreshold": 0
+            },
+            "gridParams": {
+                "allowMissingPoints": false,
+                "maxPtsLocTolerate": 25,
+                "minValidPtsInLine": 1,
+                "minValidPtsProp": 0.5
+            }
+        },
+        "fixed_pose": [
+            1.5455951565350616,
+            -0.283097746677105,
+            0.6778924920911675,
+            0.7022093003149384,
+            -0.003619814202895377,
+            0.005914811423871507,
+            -0.7119368023231846
+        ],
+        "patternSize": [
+            4,
+            5
+        ],
+        "pointsSpace": 0.035
+    },
+    "calib_type": "EyeInHand",
+    "cameras": {
+        "NEM15226A300EX07": {
+            "camera_property": {
+                "IPAddress": "192.168.1.36",
+                "cameraId": "NEM15226A300EX07",
+                "cameraModel": "ProMEnhanced",
+                "cameraParameterGroupName": "NEM15226A300EX07-EyeInHand-2022-12-06Final",
+                "configGroup": "calib",
+                "imgType2d": 0,
+                "maxSavingNum": 1000,
+                "needRectify": false,
+                "portNumber": 5577,
+                "reconnectTimes": 3,
+                "rectifyToDepthMap": true,
+                "saveDbgImgs": false,
+                "savePath": "",
+                "timeout": 20,
+                "virtualMode": false
+            },
+            "camera_type": "MechEye"
+        }
+    },
+    "error_cloud": {
+        "error_level_count": 10,
+        "error_level_interval": 0.5
+    },
+    "is_keep_offset": true,
+    "is_saving_image": true,
+    "main_camera_id": "NEM15226A300EX07",
+    "min_error_thresh": 0.0001,
+    "min_pts_cnt": 60,
+    "modify_time": "2022-12-06T16:26:46",
+    "move_params": {
+        "is_base_coord": false,
+        "move_parameters": {
+            "Pyramid": [
+                0.4,
+                0.4,
+                0.4,
+                0.4,
+                3,
+                3,
+                0.5,
+                5
+            ],
+            "Satellite": [
+                6,
+                1,
+                0.15
+            ]
+        },
+        "robot_name": ""
+    },
+    "robot": {
+        "is_moveL": false,
+        "robot_name": "",
+        "speed_ratio": 0.2,
+        "wait_time": 2
+    },
+    "robotRotationUnconstrained": true,
+    "segment_param": {
+        "image_size": [
+            1920,
+            1200
+        ],
+        "layer_ini_depth": 0.7023746337890625,
+        "layer_interval": 0.0723609130859375,
+        "region_size": [
+            1,
+            1
+        ]
+    },
+    "tcp_touch_data": {
+        "all_poses": [
+            [
+                0,
+                0,
+                0,
+                1,
+                0,
+                0,
+                0
+            ],
+            [
+                0,
+                0,
+                0,
+                1,
+                0,
+                0,
+                0
+            ],
+            [
+                0,
+                0,
+                0,
+                1,
+                0,
+                0,
+                0
+            ],
+            [
+                0,
+                0,
+                0,
+                1,
+                0,
+                0,
+                0
+            ],
+            [
+                0,
+                0,
+                0,
+                1,
+                0,
+                0,
+                0
+            ],
+            [
+                0,
+                0,
+                0,
+                1,
+                0,
+                0,
+                0
+            ],
+            [
+                0,
+                0,
+                0,
+                1,
+                0,
+                0,
+                0
+            ],
+            [
+                0,
+                0,
+                0,
+                1,
+                0,
+                0,
+                0
+            ],
+            [
+                0,
+                0,
+                0,
+                1,
+                0,
+                0,
+                0
+            ],
+            [
+                0,
+                0,
+                0,
+                1,
+                0,
+                0,
+                0
+            ],
+            [
+                0,
+                0,
+                0,
+                1,
+                0,
+                0,
+                0
+            ],
+            [
+                0,
+                0,
+                0,
+                1,
+                0,
+                0,
+                0
+            ],
+            [
+                0,
+                0,
+                0,
+                1,
+                0,
+                0,
+                0
+            ],
+            [
+                0,
+                0,
+                0,
+                1,
+                0,
+                0,
+                0
+            ],
+            [
+                0,
+                0,
+                0,
+                1,
+                0,
+                0,
+                0
+            ],
+            [
+                0,
+                0,
+                0,
+                1,
+                0,
+                0,
+                0
+            ],
+            [
+                0,
+                0,
+                0,
+                1,
+                0,
+                0,
+                0
+            ],
+            [
+                0,
+                0,
+                0,
+                1,
+                0,
+                0,
+                0
+            ],
+            [
+                0,
+                0,
+                0,
+                1,
+                0,
+                0,
+                0
+            ],
+            [
+                0,
+                0,
+                0,
+                1,
+                0,
+                0,
+                0
+            ]
+        ],
+        "capture_pose": [
+            0,
+            0,
+            0,
+            1,
+            0,
+            0,
+            0
+        ],
+        "grid": [
+            5,
+            4
+        ],
+        "pts_in_cam": [
+        ],
+        "tcp": [
+            0,
+            0,
+            0
+        ],
+        "tcp_poses": [
+        ],
+        "tri_poses": [
+            [
+                0,
+                0,
+                0,
+                1,
+                0,
+                0,
+                0
+            ],
+            [
+                0,
+                0,
+                0,
+                1,
+                0,
+                0,
+                0
+            ],
+            [
+                0,
+                0,
+                0,
+                1,
+                0,
+                0,
+                0
+            ]
+        ]
+    },
+    "useTcpTouch": false,
+    "use_ransac": false,
+    "use_two_step_method": true
+}

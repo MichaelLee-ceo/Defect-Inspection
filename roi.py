@@ -106,13 +106,19 @@ def add_light(image, gamma=1.0):
     return new_image
 
 
-def getComponent(ply_path, component_path):
+def getComponent(ply_path, component_path, tmp_path):
     ply_files = getFiles(ply_path)
+    before_files = getFiles(tmp_path)
     kmeans = KMeans(n_clusters=3)
     content = ""
     for i in range(0, len(ply_files)):
+        print(ply_files[i])
         simple_pcd = o3d.io.read_point_cloud(ply_files[i])                      # 讀點雲 .ply 檔案
         simple_pcd = simple_pcd.voxel_down_sample(voxel_size=0.002)
+
+        before_pcd = o3d.io.read_point_cloud(before_files[i])  # 讀點雲 .ply 檔案
+        before_pcd = before_pcd.voxel_down_sample(voxel_size=0.002)
+        o3d.visualization.draw_geometries([simple_pcd, before_pcd])
         # simple_pcd = simple_pcd.uniform_down_sample(every_k_points=10)
         # aabb = simple_pcd.get_axis_aligned_bounding_box()
         # aabb.color = (1, 0, 0)
