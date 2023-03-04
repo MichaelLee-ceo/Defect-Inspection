@@ -2,3 +2,8 @@
 *.ply
 *.png
 *.jpg
+*.tiff
+*.txt
+
+.idea/
+__pycache__/
