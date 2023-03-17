@@ -3,7 +3,7 @@ import numpy as np
 import copy
 from roi import *
 
-# mesh = o3d.geometry.TriangleMesh.create_coordinate_frame()
+mesh = o3d.geometry.TriangleMesh.create_coordinate_frame()
 
 # T = np.eye(4)
 # T[:3, :3] = mesh.get_rotation_matrix_from_xyz((0, np.pi / 3, np.pi / 2))
@@ -42,7 +42,7 @@ for i in range(0, len(before_plys)):
     target_np = np.asarray(target_pcd.points)
 
     # assign color to point clouds
-    source_color = np.ones(source_np.shape) * 0.5
+    source_color = np.ones(source_np.shape) * 0.9
     target_color = np.ones(target_np.shape) * 0.1       # 比較黑的
     source_pcd.colors = o3d.utility.Vector3dVector(source_color)
     target_pcd.colors = o3d.utility.Vector3dVector(target_color)
@@ -83,7 +83,8 @@ for i in range(0, len(before_plys)):
     # plt.show()
 
     source_trans = copy.deepcopy(source_pcd).transform(T)
-    # o3d.visualization.draw_geometries([source_trans, target_pcd])
+    source_trans.colors = o3d.utility.Vector3dVector(np.ones(source_np.shape) * 0.5)
+    o3d.visualization.draw_geometries([mesh, source_trans, target_pcd])
 
     trans_np = np.asarray(source_trans.points)
     print("Transformation deviation:", np.sum(trans_np - target_np))

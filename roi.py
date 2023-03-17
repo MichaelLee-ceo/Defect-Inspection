@@ -126,18 +126,21 @@ def getComponent(before_path, after_path):
 
         # assign color to point cloud
         before_color = np.ones(before_load.shape) * 0.5
-        after_color = np.ones(after_load.shape) * 0.1
+        after_color = np.ones(after_load.shape) * 0.1       # 比較黑的
         before_pcd.colors = o3d.utility.Vector3dVector(before_color)
         after_pcd.colors = o3d.utility.Vector3dVector(after_color)
-        o3d.visualization.draw_geometries([before_pcd, after_pcd])
+
+        mesh = o3d.geometry.TriangleMesh.create_coordinate_frame()
+        # mesh_tx = copy.deepcopy(mesh).translate((0, 0, 2))
+        o3d.visualization.draw_geometries([mesh, before_pcd, after_pcd])
 
 
         # vis = o3d.visualization.Visualizer()
-        # vis.create_window(visible=False)
-        # vis.add_geometry(points)
+        # vis.create_window(visible=True)
+        # vis.add_geometry(after_pcd)
         #
         # ctr = vis.get_view_control()
-        # ctr.set_lookat([0.037595129930056065, -0.017835838099320725, 0.89047966202100115])
+        # ctr.set_lookat([0.09359038310538435, -1.1479390100613966, 2.2359483714233104])
         # ctr.set_front([0, 0, -1])
         # ctr.set_up([0, -1, 0])
         #
