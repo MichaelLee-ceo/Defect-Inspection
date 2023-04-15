@@ -42,7 +42,7 @@ def saveImage_txt(image, image_path, content, content_path):
     print("[INFO] save result to:", image_path, content_path)
 
 
-def findContour(image_path, data_path, label_path):
+def findContour(image_path, data_path, label_path, visualize=False):
     img_files = getFiles(image_path)
     count = 0
     for idx, img_path in enumerate(img_files):
@@ -78,7 +78,8 @@ def findContour(image_path, data_path, label_path):
         content = ""
         for c in contours:
             x, y, w, h = cv2.boundingRect(c)
-            cv2.rectangle(crop_img, (x, y), (x + w, y + h), (0, 255, 0), thickness=2, lineType=8, shift=0)
+            if visualize:
+                cv2.rectangle(crop_img, (x, y), (x + w, y + h), (0, 255, 0), thickness=2, lineType=8, shift=0)
 
             x_center, y_center = x + w/2, y + h/2
             content += ("0" + " " + str(x_center/512) + " " + str(y_center/512) + " " + str(w/512) + " " + str(h/512) + "\n")
@@ -155,7 +156,7 @@ def getComponent(ply_path, component_path):
         # display_inlier_outlier(points, ind)
 
         vis = o3d.visualization.Visualizer()
-        vis.create_window(visible=False)
+        vis.create_window(visible=True)
         vis.add_geometry(points)
 
         ctr = vis.get_view_control()

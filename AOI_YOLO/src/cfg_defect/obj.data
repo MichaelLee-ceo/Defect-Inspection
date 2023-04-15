@@ -1,0 +1,5 @@
+classes= 1
+train  = ./src/cfg_defect/train.txt
+valid  = ./src/cfg_defect/test.txt
+names  = ./src/cfg_defect/obj.names
+backup = ./src/cfg_defect/weights

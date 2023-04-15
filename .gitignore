@@ -2,3 +2,9 @@
 *.ply
 *.png
 *.jpg
+
+# pycache
+__pycache__/
+
+# Dataset
+yolo/
