@@ -22,7 +22,7 @@ def display_inlier_outlier(cloud, ind):
 
 def mkdir(dirpath):
     if not os.path.exists(dirpath):
-        os.makedirs(dirpath)
+        os.makedirs(dirpath, exist_ok=True)
         print("[+] Creating dir", dirpath)
 
 
@@ -42,7 +42,7 @@ def saveImage_txt(image, image_path, content, content_path):
     print("[INFO] save result to:", image_path, content_path)
 
 
-def findContour(image_path, data_path, label_path, visualize=False):
+def findContour(image_path, data_path, label_path, gammas, visualize=False):
     img_files = getFiles(image_path)
     count = 0
     for idx, img_path in enumerate(img_files):
@@ -88,8 +88,6 @@ def findContour(image_path, data_path, label_path, visualize=False):
         save_path_txt = label_path + str(count) + ".txt"
         saveImage_txt(crop_img, save_path_img, content, save_path_txt)
 
-        gammas = [0.4, 0.5, 0.6]
-        # gammas = []
         for gamma in gammas:
             count += 1
             save_path_img = data_path + str(count) + ".png"
