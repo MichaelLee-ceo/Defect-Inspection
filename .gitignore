@@ -2,6 +2,7 @@
 *.ply
 *.png
 *.jpg
+*.json
 
 # pycache
 __pycache__/
