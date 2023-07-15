@@ -1,5 +1,5 @@
 '''
-- Create dataset for yolo training, 
+- Create dataset for yolo training,
   get the surface of defect component from it's 3D point clouds,
   and use findContour to label the defect area in yolo's format:
       ([x, y, w, h], [label])
@@ -36,4 +36,4 @@ if args.extract_component:
     getComponent(ply_path, component_path)
 
 brightness_factor = [0.5, 0.6, 0.8, 0.9]
-findContour(component_path, data_path, label_path, brightness_factor, visualize=True)
+findContour(component_path, data_path, label_path, brightness_factor, visualize=False)

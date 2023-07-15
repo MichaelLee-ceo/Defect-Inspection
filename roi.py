@@ -110,6 +110,7 @@ def getComponent(ply_path, component_path):
     kmeans = KMeans(n_clusters=3)
     content = ""
     for i in range(0, len(ply_files)):
+        print(ply_files[i])
         simple_pcd = o3d.io.read_point_cloud(ply_files[i])                      # 讀點雲 .ply 檔案
         simple_pcd = simple_pcd.voxel_down_sample(voxel_size=0.002)
         # simple_pcd = simple_pcd.uniform_down_sample(every_k_points=10)

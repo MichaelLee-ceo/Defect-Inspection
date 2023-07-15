@@ -8,3 +8,6 @@ __pycache__/
 
 # Dataset
 yolo/
+
+AOI_YOLO/src/
+*.weights
